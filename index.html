@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>
+Sin Function
+</title>
+<style>
+body{
+	display: flex;
+	justify-content: center;
+	background:  gray; 
+}
+.container{
+	
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+	<div><button id="draw_btn">Draw</button></div>
+	<canvas id="canvas" width=600 height=400></canvas>
+</div>
+<script type="text/javascript">
+	var context = document.getElementById("canvas").getContext("2d");
+	var animationId ;
+	var lastPoint = {x: 0, y: 0};
+	var lastTick;
+	var CYCLE = 20;
+	function drawBackground(){
+		context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+		context.fillStyle = "lightblue";
+		context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+		context.strokeStyle = "blue";
+
+		context.beginPath();
+		context.moveTo(0, context.canvas.height / 2);
+		context.lineTo(context.canvas.width, context.canvas.height / 2);
+		context.stroke();
+		context.moveTo( context.canvas.width / 2, 0);
+		context.lineTo(context.canvas.width / 2, context.canvas.height);
+		context.stroke();
+		context.closePath();
+	}
+
+	drawBackground();
+	document.getElementById("draw_btn").addEventListener("click", function(){
+		drawBackground();
+		context.save();
+		context.translate(context.canvas.width / 2, context.canvas.height/2);
+		lastPoint = {x: 0, y: 0};
+		
+		var index = 0
+		//不能使用requestAnimationFrame，效果变为一下子画出结果，由于内置的双缓冲？
+		animationId = setInterval(function(){
+			var x = context.canvas.width / 2 / CYCLE * 0.1 * index;
+			var y = 150 * Math.sin(x / 300 * 2 * Math.PI);
+			if(x <= context.canvas.width / 2  && y <= context.canvas.height/2){
+				var newPoint = {x: x,  y: y};
+
+				context.strokeStyle = "black";
+				context.beginPath();
+				context.moveTo(lastPoint.x, -lastPoint.y);
+				context.lineTo(newPoint.x, -newPoint.y);
+				context.stroke();
+				context.closePath();
+
+				context.beginPath();
+				context.moveTo(-lastPoint.x, lastPoint.y);
+				context.lineTo(-newPoint.x, newPoint.y);
+				context.stroke();
+				context.closePath();
+
+				lastPoint = newPoint;
+				index++;
+			} else {
+				context.restore();
+				clearInterval(animationId);
+			}
+		}, 50);
+	});
+
+
+</script>
+
+</body>
+</html>
